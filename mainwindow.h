@@ -19,6 +19,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void on_videofileButton_clicked();
+
+    void on_webcamButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 //    cv::Mat detectAndDisplay(cv::Mat);

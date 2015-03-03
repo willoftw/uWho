@@ -29,8 +29,28 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    std::srand(std::time(NULL));
+    QPixmap webcam("/home/josh/projects/uWho/webcam.png");
+    QPixmap videofile("/home/josh/projects/uWho/videofile.png");
+    ui->webcamButton->setIcon(webcam);
+    ui->videofileButton->setIcon(videofile);
 
+
+}
+
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::on_videofileButton_clicked()
+{
+
+}
+
+void MainWindow::on_webcamButton_clicked()
+{
+    std::srand(std::time(NULL));
     Ptr<cv::FaceRecognizer> model = cv::createLBPHFaceRecognizer(1,8,8,8, 100);
     if (face.exists()){
         model->load(face_file);
@@ -39,25 +59,25 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug() << "Generating starting model..." ;
         vector<cv::Mat> images (10);
         vector<int> labels (10);
-        images[0] = (imread("/home/josh/projects/uWho/josh1.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[0] = (imread("/home/josh/projects/uWho/startingfaces/josh1.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[0] = 0;
-        images[1] = (imread("/home/josh/projects/uWho/josh2.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[1] = (imread("/home/josh/projects/uWho/startingfaces/josh2.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[1] = 0;
-        images[2] = (imread("/home/josh/projects/uWho/josh3.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[2] = (imread("/home/josh/projects/uWho/startingfaces/josh3.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[2] = 0;
-        images[3] = (imread("/home/josh/projects/uWho/josh4.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[3] = (imread("/home/josh/projects/uWho/startingfaces/josh4.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[3] = 0;
-        images[4] = (imread("/home/josh/projects/uWho/josh5.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[4] = (imread("/home/josh/projects/uWho/startingfaces/josh5.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[4] = 0;
-        images[5] = (imread("/home/josh/projects/uWho/josh6.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[5] = (imread("/home/josh/projects/uWho/startingfaces/josh6.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[5] = 0;
-        images[6] = (imread("/home/josh/projects/uWho/josh7.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[6] = (imread("/home/josh/projects/uWho/startingfaces/josh7.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[6] = 0;
-        images[7] = (imread("/home/josh/projects/uWho/josh8.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[7] = (imread("/home/josh/projects/uWho/startingfaces/josh8.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[7] = 0;
-        images[8] = (imread("/home/josh/projects/uWho/josh9.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[8] = (imread("/home/josh/projects/uWho/startingfaces/josh9.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[8] = 0;
-        images[9] = (imread("/home/josh/projects/uWho/josh10.png", CV_LOAD_IMAGE_GRAYSCALE));
+        images[9] = (imread("/home/josh/projects/uWho/startingfaces/josh10.png", CV_LOAD_IMAGE_GRAYSCALE));
         labels[9] = 0;
         model->train(images, labels);
 
@@ -91,7 +111,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
                 cv::rectangle(frame, faces[i], cv::Scalar(255,0,255), 1, 8, 0); // Draws rectangles on webcam video
                 string faceString = static_cast<ostringstream*>( &(ostringstream() << i) )->str();
-                cv::putText(frame, faceString, cv::Point(faces[i].x, (faces[i].y+30)),FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255,255,255), 1,8, false);
+                cv::putText(frame, faceString, cv::Point(faces[i].x, (faces[i].y+30)),FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255), 1,8, false);
 
                 eyesCascade.detectMultiScale( facePicture[0], eyes, 1.1, 2, 0 |CV_HAAR_SCALE_IMAGE, Size(30, 30) );
                 if (eyes.size() != 0){
@@ -100,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent) :
                     double confidence ;
                     model->predict(facePicture[0], predicted, confidence); // Check the machine learner and ask if it's seen this face before
                     string predictString = static_cast<ostringstream*>( &(ostringstream() << predicted) )->str();
-                    cv::putText(frame, predictString, cv::Point((faces[i].x + faces[i].width - 40), (faces[i].y + 30)),FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255,255,255), 1,8, false);
+                    cv::putText(frame, predictString, cv::Point((faces[i].x + faces[i].width - 40), (faces[i].y + 30)),FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255,255,255), 1,8, false);
                     if (predicted == -1){
                         faceIndex[0] = std::rand()%30000;
                         model->update(facePicture,faceIndex); // If its not in the FaceRecognizer, add it
@@ -114,13 +134,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
             imshow("VidWindow" ,frame);}
-    }while(cv::waitKey(30)<0);
+    }while(cv::waitKey(30)<30);
     model->save(face_file);
     cv::destroyWindow("VidWindow");
-}
-
-
-MainWindow::~MainWindow()
-{
-    delete ui;
 }
